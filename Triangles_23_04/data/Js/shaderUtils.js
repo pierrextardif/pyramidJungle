@@ -7,19 +7,12 @@ function initShaderFunction(){
 	var colors = [];
 
 	for ( var i = 0; i < triangles; i ++ ) {
-
-		// positions.push( Math.random() - 0.5 );
-		// positions.push( Math.random() - 0.5 );
-		// positions.push( Math.random() - 0.5 );
-
 		colors.push( Math.random() * 255 );
 		colors.push( Math.random() * 255 );
 		colors.push( Math.random() * 255 );
 		colors.push( Math.random() * 255 );
 
 	}
-
-	// var positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
 
 	colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
 

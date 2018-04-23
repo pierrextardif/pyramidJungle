@@ -3,40 +3,13 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#oldie a { color:#da0 }
-		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<script type="text/javascript" src="data/Js/three.js"></script>
-		<!-- <script src="../build/three.js"></script> -->
-		<script type="text/javascript" src="data/Js/Detector.js"></script>
-		<!-- <script src="js/Detector.js"></script> -->
-		<script src="data/Js/Stats.min.js"></script>
+		<script type="text/javascript" src="data/build/three.min.js"></script>
+		<script type="text/javascript" src="data/build/Detector.js"></script>
+		<script src="data/build/Stats.min.js"></script>
 
 		<script type='text/javascript' src='data/Js/shaderUtils.js'></script>
 		<script type='text/javascript' src='data/Js/computeExtraFace.js'></script>
@@ -137,7 +110,7 @@
 			var camera, scene, renderer;
 
 			var group;
-			var triangles = 10;
+			var triangles = 100;
 			var itemSize = 4;
 			var positions = new Float32Array(triangles * itemSize);
 			var posForBuffer = [];
@@ -157,7 +130,7 @@
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10 );
-				camera.position.z = 10;
+				camera.position.z = 5;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
@@ -175,22 +148,11 @@
 					var yPos = randPos();
 					var zPos = randPos();
 					var rot = randRot();
-					// var xP = 	xPos * Math.cos(Math.PI * rot.x) - yPos * Math.sin(Math.PI * rot.y);
-					// var yP = 	xPos * Math.sin(Math.PI * rot.x) + yPos * Math.cos(Math.PI * rot.y);
-					// var zP = 	zPos;
 				    var pos ={x : xPos, y : yPos, z : zPos};
-				    // positions.push(xPos);
-				    // positions.push(yPos);
-				    // positions.push(zPos);
-
-					// positions.push( Math.random() - 0.5 );
-					// positions.push( Math.random() - 0.5 );
-					// positions.push( Math.random() - 0.5 );
-					// console.log(positions);
 				    var rot = triangleMesh(createRandomColor(),1,pos,rot, i * itemSize);
 				    posForBuffer.push(pos.x,pos.y,pos.z);
 				    pushINColrot(rot);
-				    console.log("rotForBuffer is : "+rotForBuffer);
+				    // console.log("rotForBuffer is : "+rotForBuffer);
 				    posForBuffer.push(pos.x + 1,pos.y,pos.z);
 				    pushINColrot(rot);
 				    posForBuffer.push(pos.x,pos.y + 1,pos.z);
@@ -222,10 +184,7 @@
 				    pushINColrot(rot);
 
 				}
-				// BufferAttribute
-				// Float32BufferAttribute
 				positionAttribute = new THREE.Float32BufferAttribute(posForBuffer, 3		);
-				// positionAttribute = new THREE.Float32BufferAttribute(posForBuffer, 3);
 				var colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
 				var rotationAttribute = new THREE.Float32BufferAttribute( rotForBuffer, 4 );
 				positionAttribute.normalized = true;
