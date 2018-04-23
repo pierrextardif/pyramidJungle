@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<title>4D</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script type="text/javascript" src="data/Js/three.min.js"></script>
+<script type="text/javascript" src="data/Js/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="data/Js/TrackballControls.js"></script>
+<script type="text/javascript" src="data/Js/Stats.js"></script>
+<script type="text/javascript" src="data/Js/Detector.js"></script>
+<script type='text/javascript' src='data/Js/dat.gui.min.js'></script>
+<!-- <script type="text/javascript" src="data/Js/VRControls.js"></script> -->
+
+<script type='x-shader/x-vertex' src='data/shaders/vertexShader.js' id="vertexshader"></script>
+<script type='x-shader/x-vertex' src='data/shaders/fragmentShader.js' id="fragmentshader"></script>
+
+<script type='text/javascript' src='data/Js/shaderUtils.js'></script>
+
+<script type='text/javascript' src='data/Js/computeExtraFace.js'></script>
+<script type='text/javascript' src='data/Js/utils.js'></script>
+
+
+
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  color: #fff;
+  margin: 0px;
+  padding: 0;
+  overflow: hidden;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+}
+
+</style>
+</head>
+
+<body>
+  <div id="container"></div>
+</body>
+
+
+
+
+<script>
+
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+document.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+});
+
+var amountOfTriangles = 1;
+var angle = 0;
+
+var uniforms, attributes, colorAttribute;
+
+var geometryFace, shaderMaterial;
+
+var object, renderer, stats;
+
+var group;
+
+
+var gui = new dat.GUI( { autoPlace: true } );
+gui.closed = true;
+var varPulse = new pulseTest();
+var VrControls = new VRModes();
+var cntrlboolCol = new colorRes();
+
+
+var WIDTH = window.innerWidth,
+  HEIGHT = window.innerHeight;
+
+init();
+// runShaderOnLine(geometryFace);
+animate();
+
+function init(){
+
+
+  renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1, antialias: true } );
+  renderer.setSize( WIDTH, HEIGHT );
+
+  var container = document.getElementById( 'container' );
+  container.appendChild( renderer.domElement );
+
+  stats = new Stats();
+  stats.domElement.style.position = 'absolute';
+  stats.domElement.style.top = '0px';
+  container.appendChild( stats.domElement );
+  group = new THREE.Group();
+
+
+  container = document.createElement( 'div' );
+  document.body.appendChild( container );
+  // camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+      camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
+      camera.position.z = 10;
+  scene = new THREE.Scene();
+  colorSelect();
+  for(var i = 0 ; i < amountOfTriangles ; i++){
+
+    var position ={x : randPos(), y : randPos(), z : randPos()};
+    triangleMesh(createRandomColor(),1,position,randRot());
+  }
+  scene.add(group);
+  centerCamera();
+  initControls();
+  guiInit();
+  addLight();  // initUniforms();
+}
+function animate() {
+  requestAnimationFrame( animate );
+  var radius = 6;
+  camera.position.x = radius * Math.cos( Math.PI - angle * 2 );
+  camera.position.y = radius * Math.cos( angle );
+  camera.position.z = radius * 2 * Math.sin( angle );
+  angle += 0.01;
+  var osc = {x:0,y:0,z:0};
+  var l = scene.children.length;
+  controls.update();
+  render();
+  stats.update();
+}
+
+function render() {
+
+  var timer = Date.now() * 0.001;
+
+  animatePointyPyramid(timer);
+  renderer.render( scene, camera );
+}
+window.addEventListener('resize', onResize);
+window.addEventListener('vrdisplaypresentchange', onVRDisplayPresentChange);
+</script>
+
+</html>
