@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<script type="text/javascript" src="data/build/three.min.js"></script>
+		<script type="text/javascript" src="data/build/Detector.js"></script>
+		<script src="data/build/Stats.min.js"></script>
+
+		<script type='text/javascript' src='data/Js/shaderUtils.js'></script>
+		<script type='text/javascript' src='data/Js/computeExtraFace.js'></script>
+		<script type='text/javascript' src='data/Js/utils.js'></script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			precision mediump float;
+			precision mediump int;
+
+			uniform mat4 modelViewMatrix; // optional
+			uniform mat4 projectionMatrix; // optional
+
+			attribute vec3 position;
+			attribute vec4 rotation;
+			attribute float extraFace;
+			
+			attribute vec4 color;
+
+			varying vec3 vPosition;
+			varying vec4 vRotation;
+			varying vec4 vColor;
+			varying float faceExtra;
+			varying vec4 rot;
+		//-----//
+			vec3 applyTRS( vec3 position, vec3 translation, vec4 quaternion, vec3 scale ) {
+
+				position *= scale;
+				position += 2.0 * cross( quaternion.xyz, cross( quaternion.xyz, position ) + quaternion.w * position );
+				return position + translation;
+
+			}
+		//--------//
+
+			void main()	{
+
+				vPosition = position;
+				faceExtra = extraFace;
+				rot = rotation;
+				vec3 scale = vec3(1,1,1);
+				vec3 translation = vec3(0,0,0);
+				vec3 pos = applyTRS(position.xyz,translation, rotation,scale );
+				vColor = color;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			precision mediump float;
+			precision mediump int;
+
+			uniform float time;
+
+			varying vec3 vPosition;
+			varying vec4 vColor;
+			varying float faceExtra;
+			varying vec4 rot;
+
+			void main()	{
+
+				vec4 color = vec4( vColor );
+				if(faceExtra == 1.0){
+					color.r +=  sin(vPosition.x * vPosition.y * 10.0 + time * vPosition.x * vPosition.z ) * 0.5;
+					color.g += sin(rot.x * rot.y + time * rot.x ) * 0.2;
+				}else{
+					color.r +=  sin(vPosition.x * vPosition.y * 10.0 + time * vPosition.x * vPosition.z ) * 0.5;
+				}
+
+				gl_FragColor = color;
+
+			}
+
+		</script>
+
+		<script>
+
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var group;
+			var triangles = 1;
+			var itemSize = 4;
+			var positions = new Float32Array(triangles * itemSize);
+			var posForBuffer = [];
+			var rotForBuffer = [];
+			var extraFaceBuffer = [];
+			var colors = [];
+			var positionAttribute;
+
+			var shaderMaterial;
+
+			var pyramid;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.z = 8;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x101010 );
+				group = new THREE.Group();
+
+				// geometry
+				var amountOfTriangles = triangles;
+
+
+				var geometry = new THREE.BufferGeometry();
+
+
+				for ( var i = 0; i < triangles; i ++ ) {
+					var xPos = randPos();
+					var yPos = randPos();
+					var zPos = randPos();
+					var rot = randRot();
+				    var pos ={x : xPos, y : yPos, z : zPos};
+				    var rot = triangleMesh(createRandomColor(),1,pos,rot, i * itemSize);
+				    pushPyramid(1, pos, rot);
+
+				}
+				positionAttribute = new THREE.Float32BufferAttribute(posForBuffer, 3		);
+				var colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
+				var rotationAttribute = new THREE.Float32BufferAttribute( rotForBuffer, 4 );
+				var extraFaceAttribute = new THREE.Float32BufferAttribute( extraFaceBuffer, 1 );
+				positionAttribute.normalized = true;
+				positionAttribute.dynamic = true;
+				colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
+
+				rotationAttribute.normalized = true;
+
+				geometry.addAttribute( 'position', positionAttribute );
+				geometry.addAttribute( 'color', colorAttribute );
+
+				geometry.addAttribute('rotation', rotationAttribute);
+				geometry.addAttribute('extraFace', extraFaceAttribute);
+				// material
+
+				shaderMaterial = new THREE.RawShaderMaterial( {
+
+					uniforms: {
+						time: { value: 1.0 }
+					},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity : 0.3
+
+				} );
+
+				var mesh = new THREE.Mesh( geometry, shaderMaterial );
+				scene.add( mesh );
+
+				scene.add(group);
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize( event ) {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = performance.now();
+
+				var object = scene.children[ 0 ];
+				var object2 = scene.children[ 1 ];
+
+				object.rotation.y = time * 0.0005;
+				object2.rotation.y = time * 0.0005;
+				object.material.uniforms.time.value = time * 0.005;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
