@@ -75,10 +75,10 @@
 
 				vec4 color = vec4( vColor );
 				if(faceExtra == 1.0){
-					color.r +=  sin(vPosition.x * vPosition.y * 10.0 + time * vPosition.x * vPosition.z ) * 0.5;
-					color.g += sin(rot.x * rot.y + time * rot.x ) * 0.2;
+					// color.r +=  sin(vPosition.x * vPosition.y * 10.0 + time * vPosition.x * vPosition.z ) * 0.5;
+					// color.g += sin(rot.x * rot.y + time * rot.x ) * 0.2;
 				}else{
-					color.r +=  sin(vPosition.x * vPosition.y * 10.0 + time * vPosition.x * vPosition.z ) * 0.5;
+					// color.r +=  sin(vPosition.x * vPosition.y * 10.0 + time * vPosition.x * vPosition.z ) * 0.5;
 				}
 
 				gl_FragColor = color;

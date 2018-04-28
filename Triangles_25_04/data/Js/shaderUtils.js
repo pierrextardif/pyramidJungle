@@ -68,7 +68,7 @@ function quat(geom){
 function pushColorRot(col,rot){
 	colors.push(col.r,col.g,col.b,Math.random() * 255);
 	rotForBuffer.push(rot.x,rot.y,rot.z,rot.w);
-  	extraFaceBuffer.push(1.0);
+  extraFaceBuffer.push(1.0);
 }
 function pushINColrot(rot){
   colors.push( Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() * 255 );
@@ -92,6 +92,17 @@ function colVariationG(col, variation){
 function colVariationB(col, variation){
 	var b = col.b + variation / 2 - Math.random() * variation;
 	return {"r":col.r * 255, "g":col.g * 255, "b":b * 255};
+}
+function colorVar(col, variation){
+  var colAttrib = Math.round(Math.random() * 2);
+  if(colAttrib == 0){
+    col.r = col.r + variation * 255;
+  }else if(colAttrib == 1){
+    col.g = col.g + variation * 255;
+  }else if(colAttrib == 2){
+    col.g = col.g + variation * 255;
+  }
+  return col;
 }
 
 
@@ -152,38 +163,80 @@ function pushPointyPyramid(scale, pos, rot, n, color, propColVar){
   var col = colVariationR(color,propColVar);
   posForBuffer.push(pos[0].x,pos[0].y,pos[0].z);
   pushColorRot(col, rot);
+  var prop = 0.05;
+  var colVar = colorVar(col,prop);
   posForBuffer.push(n.x,n.y,n.z);
-  pushColorRot(col, rot);
+  pushColorRot(colVar, rot);
   posForBuffer.push(pos[1].x,pos[1].y,pos[1].z);
-  pushColorRot(col, rot);
+  colVar = colorVar(col,prop);
+  pushColorRot(colVar, rot);
 
   // //face 2
   col = colVariationG(color,propColVar);
   posForBuffer.push(pos[0].x,pos[0].y,pos[0].z);
   pushColorRot(col, rot);
+  var prop = 0.05;
+  colVar = colorVar(col,prop);
   posForBuffer.push(n.x,n.y,n.z);
-  pushColorRot(col, rot);
+  pushColorRot(colVar, rot);
   posForBuffer.push(pos[2].x,pos[2].y,pos[2].z);
-  pushColorRot(col, rot);
+  colVar = colorVar(col,prop);
+  pushColorRot(colVar, rot);
 
   // //face 3
   col = colVariationB(color,propColVar);
   posForBuffer.push(n.x,n.y,n.z);
   pushColorRot(col, rot);
+  var prop = 0.05;
+  colVar = colorVar(col,prop);
   posForBuffer.push(pos[1].x,pos[1].y,pos[1].z);
-  pushColorRot(col, rot);
+  pushColorRot(colVar, rot);
   posForBuffer.push(pos[2].x,pos[2].y,pos[2].z);
-  pushColorRot(col, rot);
+  colVar = colorVar(col,prop);
+  pushColorRot(colVar, rot);
 
   // //face 4
   col = colVariation(color,propColVar);
   posForBuffer.push(pos[0].x,pos[0].y,pos[0].z);
   pushColorRot(col, rot);
+  var prop = 0.05;
+  colVar = colorVar(col,prop);
   posForBuffer.push(pos[1].x,pos[1].y,pos[1].z);
-  pushColorRot(col, rot);
+  pushColorRot(colVar, rot);
   posForBuffer.push(pos[2].x,pos[2].y,pos[2].z);
-  pushColorRot(col, rot);
+  colVar = colorVar(col,prop);
+  pushColorRot(colVar, rot);
 
 
 }
- 
+
+function pushPosPyramid(array, pos, color, prop, rot){
+
+  var propColVarTriangle = prop[0];
+  var propColVarVertex = prop[1];
+
+  var col;
+  var index = 0;
+
+  var colorChange = Math.round(Math.random() * 2);
+  switch(colorChange) {
+      case 0:
+        col = colVariationR(color,propColVarTriangle);
+      break;
+
+      case 1:
+        col = colVariationG(color,propColVarTriangle);
+      break;
+
+      case 2:
+        col = colVariationB(color,propColVarTriangle);
+      break;
+
+  }
+  for (var i = 0; i < array.length; i++) {
+    posForBuffer.push(pos[array[i]].x,pos[array[i]].y,pos[array[i]].z);
+    pushColorRot(col, rot);
+    col = colorVar(col,propColVarVertex);
+  }
+
+}

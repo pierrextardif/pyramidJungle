@@ -80,9 +80,9 @@ function computeNewFacePyramid(face){
   geometryFace = new THREE.Geometry();
   geometryFace.verticesNeedUpdate = true;
 
-  n.x = (dir.x * n.x + (face.v[0].x + face.v[1].x + face.v[2].x)/3) * prop[0];
-  n.y = (dir.y * n.y + (face.v[0].y + face.v[1].y + face.v[2].y)/3) * prop[1];
-  n.z = (dir.z * n.z + (face.v[0].z + face.v[1].z + face.v[2].z)/3) * prop[2];
+  n.x = (dir.x * n.x + (face.v[0].x + face.v[1].x + face.v[2].x)/3) * prop[0] / 2;
+  n.y = (dir.y * n.y + (face.v[0].y + face.v[1].y + face.v[2].y)/3) * prop[1] / 2;
+  n.z = (dir.z * n.z + (face.v[0].z + face.v[1].z + face.v[2].z)/3) * prop[2] / 2;
 
 
   geometryFace.vertices.push(
@@ -112,8 +112,16 @@ function computeNewFacePyramid(face){
   pointyFace.updateMatrixWorld(true);
   pointyFace.name = "pointyFace";
   var quaternion = quat(pointyFace);
-  var colorVar = 0.1;
-  pushPointyPyramid(1, v, quaternion, n, color, colorVar);
+
+  var pyramidProp = [0.06, 0.03];
+  var arrayOfVertices = [];
+  arrayOfVertices.push(
+    0,1,2,
+    0,1,3,
+    1,2,3,
+    0,2,3);
+  pushPosPyramid(arrayOfVertices, geometryFace.vertices, color, pyramidProp, quaternion);
+
   group.add(pointyFace);
 }
 
