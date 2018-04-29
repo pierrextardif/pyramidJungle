@@ -6,7 +6,7 @@ function randOneRot(){
   return Math.PI - 2 * (Math.random() * Math.PI );
 }
 function randPos(){
-  var sizePerimeter = 2;
+  var sizePerimeter = 6;
   return sizePerimeter / 2 - (Math.random() * sizePerimeter );
 }
 function animatePyGeo(s, oscillator){

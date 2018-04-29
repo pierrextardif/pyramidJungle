@@ -1,6 +1,5 @@
 //arrays Initialisation
 function triangleMesh(color,scale,p,rot, index){
-  var scale = 1;
   var geometry = new THREE.Geometry();
   geometry.verticesNeedUpdate = true;
   geometry.vertices.push(
